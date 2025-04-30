@@ -61,9 +61,10 @@ cd tactology_task
 ### Install Dependencies
 
 Run the following command to install the project dependencies:
+Please add `--legacy-peer-deps` when trying to install packages to avoid conflicts.
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 ```
 
 ---
@@ -75,17 +76,17 @@ npm install
 Ensure that the `.env` file is present in the root directory of the project. Below is a sample `.env` file:
 
 ```bash
-PORT=3000
-DATABASE_HOST=localhost
-DATABASE_PORT=5432
-DATABASE_USERNAME=your-database-username
-DATABASE_PASSWORD=your-database-password
-DATABASE_NAME=your-database-name
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=your_db_user
+DB_PASSWORD=your_password
+DB_NAME=your_db_name
+DB_SSL=true
 JWT_SECRET=your-jwt-secret-key
-JWT_EXPIRATION_TIME=3600
+JWT_EXPIRES_IN=1d
 ```
 
-You can update the environment variables as per your requirements.
+You can update the environment variables as per your own credentials.
 
 ---
 
