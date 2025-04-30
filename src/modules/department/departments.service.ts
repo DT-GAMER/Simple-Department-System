@@ -1,23 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Department } from './entities/department.entity';
 import { SubDepartment } from './entities/sub-department.entity';
 import { CreateDepartmentInput } from './dtos/create-department.input';
 import { UpdateDepartmentInput } from './dtos/update-department.input';
 import { CreateSubDepartmentInput } from './dtos/create-sub-department.input';
+import { DeleteResult } from 'typeorm';
 
 @Injectable()
 export class DepartmentsService {
-  findAll() {
-      throw new Error('Method not implemented.');
-  }
-  findOne(id: number) {
-      throw new Error('Method not implemented.');
-  }
-  create(createDepartmentInput: CreateDepartmentInput) {
-      throw new Error('Method not implemented.');
-  }
   constructor(
     @InjectRepository(Department)
     private readonly departmentsRepository: Repository<Department>,
@@ -26,17 +18,17 @@ export class DepartmentsService {
     private readonly subDepartmentsRepository: Repository<SubDepartment>,
   ) {}
 
-  // Create a new department, optionally with sub-departments
+  // Create a new department with optional sub-departments
   async createDepartment(
-    createDepartmentInput: CreateDepartmentInput,
-    subDepartmentsInput?: CreateSubDepartmentInput[],
+input: CreateDepartmentInput, subDepartmentsInput: CreateSubDepartmentInput[],
   ): Promise<Department> {
-    const department = this.departmentsRepository.create(createDepartmentInput);
+    const department = this.departmentsRepository.create({
+      name: input.name,
+    });
 
-    // If sub-department data is provided, create sub-departments
-    if (subDepartmentsInput && subDepartmentsInput.length > 0) {
-      const subDepartments = subDepartmentsInput.map(subDept =>
-        this.subDepartmentsRepository.create({ ...subDept, department }),
+    if (input.subDepartments && input.subDepartments.length > 0) {
+      const subDepartments = input.subDepartments.map(subDept =>
+        this.subDepartmentsRepository.create({ name: subDept.name, department }),
       );
       department.subDepartments = subDepartments;
     }
@@ -44,59 +36,69 @@ export class DepartmentsService {
     return this.departmentsRepository.save(department);
   }
 
-  // Update an existing department
+  // Update an existing department, handle add/remove sub-departments
   async updateDepartment(
-    departmentId: number,
-    updateDepartmentInput: UpdateDepartmentInput,
+    id: number,
+    input: UpdateDepartmentInput,
   ): Promise<Department> {
     const department = await this.departmentsRepository.findOne({
-      where: { id: departmentId },
+      where: { id },
       relations: ['subDepartments'],
     });
 
     if (!department) {
-      throw new NotFoundException(`Department with ID ${departmentId} not found`);
+      throw new NotFoundException(`Department with ID ${id} not found`);
     }
 
-    Object.assign(department, updateDepartmentInput);
+    department.name = input.name || department.name;
+
+    // Remove sub-departments
+    if (input.removeSubDepartmentIds?.length) {
+      await this.subDepartmentsRepository.delete({ id: In(input.removeSubDepartmentIds) });
+      department.subDepartments = department.subDepartments.filter(
+        sd => !input.removeSubDepartmentIds.includes(sd.id),
+      );
+    }
+
+    // Add new sub-departments
+    if (input.subDepartments?.length) {
+      const newSubs = input.subDepartments.map(sub =>
+        this.subDepartmentsRepository.create({ name: sub.name, department }),
+      );
+      department.subDepartments.push(...newSubs);
+    }
+
     return this.departmentsRepository.save(department);
   }
 
-  // Get department by ID with sub-departments
-  async getDepartmentById(departmentId: number): Promise<Department> {
+  // Get all departments with sub-departments
+  async getAllDepartments(): Promise<Department[]> {
+    return this.departmentsRepository.find({ relations: ['subDepartments'] });
+  }
+
+  // Get single department
+  async getDepartmentById(id: number): Promise<Department> {
     const department = await this.departmentsRepository.findOne({
-      where: { id: departmentId },
+      where: { id },
       relations: ['subDepartments'],
     });
 
     if (!department) {
-      throw new NotFoundException(`Department with ID ${departmentId} not found`);
+      throw new NotFoundException(`Department with ID ${id} not found`);
     }
 
     return department;
   }
 
-  // Get all departments
-  async getAllDepartments(): Promise<Department[]> {
-    return this.departmentsRepository.find({
-      relations: ['subDepartments'],
-    });
-  }
-
-  // Delete department by ID
-  async deleteDepartment(departmentId: number): Promise<void> {
+  // Delete a department and its sub-departments
+  async deleteDepartment(id: number): Promise<void> {
     const department = await this.departmentsRepository.findOne({
-      where: { id: departmentId },
+      where: { id },
       relations: ['subDepartments'],
     });
 
     if (!department) {
-      throw new NotFoundException(`Department with ID ${departmentId} not found`);
-    }
-
-    // Delete sub-departments associated with the department
-    if (department.subDepartments && department.subDepartments.length > 0) {
-      await this.subDepartmentsRepository.remove(department.subDepartments);
+      throw new NotFoundException(`Department with ID ${id} not found`);
     }
 
     await this.departmentsRepository.remove(department);
@@ -121,9 +123,21 @@ export class DepartmentsService {
     );
 
     department.subDepartments.push(...subDepartments);
-
     await this.departmentsRepository.save(department);
+
     return department;
   }
-}
 
+  // Delete a sub-department
+  async deleteSubDepartment(subDepartmentId: number): Promise<DeleteResult> {
+    const subDepartment = await this.subDepartmentsRepository.findOne({
+      where: { id: subDepartmentId },
+    });
+
+    if (!subDepartment) {
+      throw new NotFoundException(`Sub-department with ID ${subDepartmentId} not found`);
+    }
+
+    return this.subDepartmentsRepository.delete(subDepartmentId);
+  }
+}

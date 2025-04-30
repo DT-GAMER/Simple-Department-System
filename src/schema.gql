@@ -34,13 +34,15 @@ type DepartmentResponseDto {
 }
 
 type Mutation {
-  createDepartment(createDepartmentInput: CreateDepartmentInput!): DepartmentResponseDto!
-  deleteDepartment(id: Float!): Boolean!
-  updateDepartment(id: Float!, updateDepartmentInput: UpdateDepartmentInput!): DepartmentResponseDto!
+  addSubDepartmentsToExistingDepartment(departmentId: Int!, subDepartments: [CreateSubDepartmentInput!]!): DepartmentResponseDto!
+  createDepartment(createDepartmentInput: CreateDepartmentInput!, subDepartmentsInput: [CreateSubDepartmentInput!]): DepartmentResponseDto!
+  deleteDepartment(id: Int!): Boolean!
+  deleteSubDepartment(id: Int!): Boolean!
+  updateDepartment(id: Int!, updateDepartmentInput: UpdateDepartmentInput!): DepartmentResponseDto!
 }
 
 type Query {
-  department(id: Float!): DepartmentResponseDto!
+  department(id: Int!): DepartmentResponseDto!
   departments: [DepartmentResponseDto!]!
   hello: String!
 }
@@ -64,5 +66,8 @@ type SubDepartmentResponseDto {
 
 input UpdateDepartmentInput {
   name: String!
+
+  """IDs of sub-departments to remove"""
+  removeSubDepartmentIds: [Int!]
   subDepartments: [CreateSubDepartmentInput!]
 }

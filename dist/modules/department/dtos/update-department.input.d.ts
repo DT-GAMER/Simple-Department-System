@@ -4,5 +4,6 @@ declare const UpdateDepartmentInput_base: import("@nestjs/common").Type<Partial<
 export declare class UpdateDepartmentInput extends UpdateDepartmentInput_base {
     name?: string;
     subDepartments?: CreateSubDepartmentInput[];
+    removeSubDepartmentIds?: number[];
 }
 export {};

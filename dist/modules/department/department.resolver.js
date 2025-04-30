@@ -17,6 +17,7 @@ const graphql_1 = require("@nestjs/graphql");
 const departments_service_1 = require("./departments.service");
 const create_department_input_1 = require("./dtos/create-department.input");
 const update_department_input_1 = require("./dtos/update-department.input");
+const create_sub_department_input_1 = require("./dtos/create-sub-department.input");
 const department_response_dto_1 = require("./dtos/department-response.dto");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const common_1 = require("@nestjs/common");
@@ -39,7 +40,7 @@ let DepartmentsResolver = class DepartmentsResolver {
             name: department.name,
             createdAt: department.createdAt,
             updatedAt: department.updatedAt,
-            subDepartments: department.subDepartments?.map(this.toSubDepartmentDto),
+            subDepartments: department.subDepartments?.map(this.toSubDepartmentDto.bind(this)),
         };
     }
     async getAllDepartments() {
@@ -53,8 +54,8 @@ let DepartmentsResolver = class DepartmentsResolver {
         }
         return this.toDepartmentDto(department);
     }
-    async createDepartment(createDepartmentInput) {
-        const department = await this.departmentsService.createDepartment(createDepartmentInput);
+    async createDepartment(createDepartmentInput, subDepartmentsInput) {
+        const department = await this.departmentsService.createDepartment(createDepartmentInput, subDepartmentsInput);
         return this.toDepartmentDto(department);
     }
     async updateDepartment(id, updateDepartmentInput) {
@@ -64,6 +65,17 @@ let DepartmentsResolver = class DepartmentsResolver {
     async deleteDepartment(id) {
         await this.departmentsService.deleteDepartment(id);
         return true;
+    }
+    async addSubDepartmentsToExistingDepartment(departmentId, subDepartments) {
+        const department = await this.departmentsService.addSubDepartmentsToExistingDepartment(departmentId, subDepartments);
+        if (!department) {
+            throw new common_1.NotFoundException(`Department with ID ${departmentId} not found`);
+        }
+        return this.toDepartmentDto(department);
+    }
+    async deleteSubDepartment(id) {
+        const result = await this.departmentsService.deleteSubDepartment(id);
+        return result.affected > 0;
     }
 };
 exports.DepartmentsResolver = DepartmentsResolver;
@@ -77,7 +89,7 @@ __decorate([
 __decorate([
     (0, graphql_1.Query)(() => department_response_dto_1.DepartmentResponseDto, { name: 'department' }),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    __param(0, (0, graphql_1.Args)('id')),
+    __param(0, (0, graphql_1.Args)('id', { type: () => graphql_1.Int })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
@@ -85,16 +97,17 @@ __decorate([
 __decorate([
     (0, graphql_1.Mutation)(() => department_response_dto_1.DepartmentResponseDto, { name: 'createDepartment' }),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    __param(0, (0, graphql_1.Args)('createDepartmentInput')),
+    __param(0, (0, graphql_1.Args)('createDepartmentInput', { type: () => create_department_input_1.CreateDepartmentInput })),
+    __param(1, (0, graphql_1.Args)('subDepartmentsInput', { type: () => [create_sub_department_input_1.CreateSubDepartmentInput], nullable: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_department_input_1.CreateDepartmentInput]),
+    __metadata("design:paramtypes", [create_department_input_1.CreateDepartmentInput, Array]),
     __metadata("design:returntype", Promise)
 ], DepartmentsResolver.prototype, "createDepartment", null);
 __decorate([
     (0, graphql_1.Mutation)(() => department_response_dto_1.DepartmentResponseDto, { name: 'updateDepartment' }),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    __param(0, (0, graphql_1.Args)('id')),
-    __param(1, (0, graphql_1.Args)('updateDepartmentInput')),
+    __param(0, (0, graphql_1.Args)('id', { type: () => graphql_1.Int })),
+    __param(1, (0, graphql_1.Args)('updateDepartmentInput', { type: () => update_department_input_1.UpdateDepartmentInput })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, update_department_input_1.UpdateDepartmentInput]),
     __metadata("design:returntype", Promise)
@@ -102,11 +115,28 @@ __decorate([
 __decorate([
     (0, graphql_1.Mutation)(() => Boolean, { name: 'deleteDepartment' }),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    __param(0, (0, graphql_1.Args)('id')),
+    __param(0, (0, graphql_1.Args)('id', { type: () => graphql_1.Int })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], DepartmentsResolver.prototype, "deleteDepartment", null);
+__decorate([
+    (0, graphql_1.Mutation)(() => department_response_dto_1.DepartmentResponseDto, { name: 'addSubDepartmentsToExistingDepartment' }),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, graphql_1.Args)('departmentId', { type: () => graphql_1.Int })),
+    __param(1, (0, graphql_1.Args)('subDepartments', { type: () => [create_sub_department_input_1.CreateSubDepartmentInput] })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Array]),
+    __metadata("design:returntype", Promise)
+], DepartmentsResolver.prototype, "addSubDepartmentsToExistingDepartment", null);
+__decorate([
+    (0, graphql_1.Mutation)(() => Boolean, { name: 'deleteSubDepartment' }),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, graphql_1.Args)('id', { type: () => graphql_1.Int })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], DepartmentsResolver.prototype, "deleteSubDepartment", null);
 exports.DepartmentsResolver = DepartmentsResolver = __decorate([
     (0, graphql_1.Resolver)(() => department_response_dto_1.DepartmentResponseDto),
     __metadata("design:paramtypes", [departments_service_1.DepartmentsService])

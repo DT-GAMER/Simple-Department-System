@@ -4,17 +4,16 @@ import { SubDepartment } from './entities/sub-department.entity';
 import { CreateDepartmentInput } from './dtos/create-department.input';
 import { UpdateDepartmentInput } from './dtos/update-department.input';
 import { CreateSubDepartmentInput } from './dtos/create-sub-department.input';
+import { DeleteResult } from 'typeorm';
 export declare class DepartmentsService {
     private readonly departmentsRepository;
     private readonly subDepartmentsRepository;
-    findAll(): void;
-    findOne(id: number): void;
-    create(createDepartmentInput: CreateDepartmentInput): void;
     constructor(departmentsRepository: Repository<Department>, subDepartmentsRepository: Repository<SubDepartment>);
-    createDepartment(createDepartmentInput: CreateDepartmentInput, subDepartmentsInput?: CreateSubDepartmentInput[]): Promise<Department>;
-    updateDepartment(departmentId: number, updateDepartmentInput: UpdateDepartmentInput): Promise<Department>;
-    getDepartmentById(departmentId: number): Promise<Department>;
+    createDepartment(input: CreateDepartmentInput, subDepartmentsInput: CreateSubDepartmentInput[]): Promise<Department>;
+    updateDepartment(id: number, input: UpdateDepartmentInput): Promise<Department>;
     getAllDepartments(): Promise<Department[]>;
-    deleteDepartment(departmentId: number): Promise<void>;
+    getDepartmentById(id: number): Promise<Department>;
+    deleteDepartment(id: number): Promise<void>;
     addSubDepartmentsToExistingDepartment(departmentId: number, subDepartmentsInput: CreateSubDepartmentInput[]): Promise<Department>;
+    deleteSubDepartment(subDepartmentId: number): Promise<DeleteResult>;
 }

@@ -29,6 +29,13 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Array)
 ], UpdateDepartmentInput.prototype, "subDepartments", void 0);
+__decorate([
+    (0, graphql_1.Field)(() => [graphql_1.Int], { nullable: true, description: 'IDs of sub-departments to remove' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsInt)({ each: true }),
+    __metadata("design:type", Array)
+], UpdateDepartmentInput.prototype, "removeSubDepartmentIds", void 0);
 exports.UpdateDepartmentInput = UpdateDepartmentInput = __decorate([
     (0, graphql_1.InputType)()
 ], UpdateDepartmentInput);

@@ -19,63 +19,59 @@ const typeorm_2 = require("typeorm");
 const department_entity_1 = require("./entities/department.entity");
 const sub_department_entity_1 = require("./entities/sub-department.entity");
 let DepartmentsService = class DepartmentsService {
-    findAll() {
-        throw new Error('Method not implemented.');
-    }
-    findOne(id) {
-        throw new Error('Method not implemented.');
-    }
-    create(createDepartmentInput) {
-        throw new Error('Method not implemented.');
-    }
     constructor(departmentsRepository, subDepartmentsRepository) {
         this.departmentsRepository = departmentsRepository;
         this.subDepartmentsRepository = subDepartmentsRepository;
     }
-    async createDepartment(createDepartmentInput, subDepartmentsInput) {
-        const department = this.departmentsRepository.create(createDepartmentInput);
-        if (subDepartmentsInput && subDepartmentsInput.length > 0) {
-            const subDepartments = subDepartmentsInput.map(subDept => this.subDepartmentsRepository.create({ ...subDept, department }));
+    async createDepartment(input, subDepartmentsInput) {
+        const department = this.departmentsRepository.create({
+            name: input.name,
+        });
+        if (input.subDepartments && input.subDepartments.length > 0) {
+            const subDepartments = input.subDepartments.map(subDept => this.subDepartmentsRepository.create({ name: subDept.name, department }));
             department.subDepartments = subDepartments;
         }
         return this.departmentsRepository.save(department);
     }
-    async updateDepartment(departmentId, updateDepartmentInput) {
+    async updateDepartment(id, input) {
         const department = await this.departmentsRepository.findOne({
-            where: { id: departmentId },
+            where: { id },
             relations: ['subDepartments'],
         });
         if (!department) {
-            throw new common_1.NotFoundException(`Department with ID ${departmentId} not found`);
+            throw new common_1.NotFoundException(`Department with ID ${id} not found`);
         }
-        Object.assign(department, updateDepartmentInput);
+        department.name = input.name || department.name;
+        if (input.removeSubDepartmentIds?.length) {
+            await this.subDepartmentsRepository.delete({ id: (0, typeorm_2.In)(input.removeSubDepartmentIds) });
+            department.subDepartments = department.subDepartments.filter(sd => !input.removeSubDepartmentIds.includes(sd.id));
+        }
+        if (input.subDepartments?.length) {
+            const newSubs = input.subDepartments.map(sub => this.subDepartmentsRepository.create({ name: sub.name, department }));
+            department.subDepartments.push(...newSubs);
+        }
         return this.departmentsRepository.save(department);
     }
-    async getDepartmentById(departmentId) {
+    async getAllDepartments() {
+        return this.departmentsRepository.find({ relations: ['subDepartments'] });
+    }
+    async getDepartmentById(id) {
         const department = await this.departmentsRepository.findOne({
-            where: { id: departmentId },
+            where: { id },
             relations: ['subDepartments'],
         });
         if (!department) {
-            throw new common_1.NotFoundException(`Department with ID ${departmentId} not found`);
+            throw new common_1.NotFoundException(`Department with ID ${id} not found`);
         }
         return department;
     }
-    async getAllDepartments() {
-        return this.departmentsRepository.find({
-            relations: ['subDepartments'],
-        });
-    }
-    async deleteDepartment(departmentId) {
+    async deleteDepartment(id) {
         const department = await this.departmentsRepository.findOne({
-            where: { id: departmentId },
+            where: { id },
             relations: ['subDepartments'],
         });
         if (!department) {
-            throw new common_1.NotFoundException(`Department with ID ${departmentId} not found`);
-        }
-        if (department.subDepartments && department.subDepartments.length > 0) {
-            await this.subDepartmentsRepository.remove(department.subDepartments);
+            throw new common_1.NotFoundException(`Department with ID ${id} not found`);
         }
         await this.departmentsRepository.remove(department);
     }
@@ -91,6 +87,15 @@ let DepartmentsService = class DepartmentsService {
         department.subDepartments.push(...subDepartments);
         await this.departmentsRepository.save(department);
         return department;
+    }
+    async deleteSubDepartment(subDepartmentId) {
+        const subDepartment = await this.subDepartmentsRepository.findOne({
+            where: { id: subDepartmentId },
+        });
+        if (!subDepartment) {
+            throw new common_1.NotFoundException(`Sub-department with ID ${subDepartmentId} not found`);
+        }
+        return this.subDepartmentsRepository.delete(subDepartmentId);
     }
 };
 exports.DepartmentsService = DepartmentsService;
