@@ -1,0 +1,1 @@
+{"version":3,"file":"update-sub-department.input.js","sourceRoot":"","sources":["../../../../src/modules/department/dtos/update-sub-department.input.ts"],"names":[],"mappings":";;;;;;;;;;;;AACA,6CAAmD;AAG5C,IAAM,wBAAwB,GAA9B,MAAM,wBAAwB;CAGpC,CAAA;AAHY,4DAAwB;AAEnC;IADC,IAAA,eAAK,EAAC,EAAE,QAAQ,EAAE,IAAI,EAAE,CAAC;;sDACZ;mCAFH,wBAAwB;IADpC,IAAA,mBAAS,GAAE;GACC,wBAAwB,CAGpC"}

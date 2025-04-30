@@ -1,0 +1,68 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input CreateDepartmentInput {
+  name: String!
+  subDepartments: [CreateSubDepartmentInput!]
+}
+
+input CreateSubDepartmentInput {
+  name: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Department {
+  createdAt: DateTime!
+  description: String
+  id: Float!
+  name: String!
+  subDepartments: [SubDepartment!]
+  updatedAt: DateTime!
+}
+
+type DepartmentResponseDto {
+  createdAt: DateTime!
+  id: Float!
+  name: String!
+  subDepartments: [SubDepartmentResponseDto!]
+  updatedAt: DateTime!
+}
+
+type Mutation {
+  createDepartment(createDepartmentInput: CreateDepartmentInput!): DepartmentResponseDto!
+  deleteDepartment(id: Float!): Boolean!
+  updateDepartment(id: Float!, updateDepartmentInput: UpdateDepartmentInput!): DepartmentResponseDto!
+}
+
+type Query {
+  department(id: Float!): DepartmentResponseDto!
+  departments: [DepartmentResponseDto!]!
+  hello: String!
+}
+
+type SubDepartment {
+  createdAt: DateTime!
+  department: Department!
+  description: String
+  id: Float!
+  name: String!
+  updatedAt: DateTime!
+}
+
+type SubDepartmentResponseDto {
+  createdAt: DateTime!
+  departmentId: Float!
+  id: Float!
+  name: String!
+  updatedAt: DateTime!
+}
+
+input UpdateDepartmentInput {
+  name: String!
+  subDepartments: [CreateSubDepartmentInput!]
+}
