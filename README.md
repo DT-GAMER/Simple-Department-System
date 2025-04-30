@@ -130,37 +130,15 @@ You must include the **Authorization header** with the **Bearer token** in your 
 Authorization: Bearer <your-access-token>
 ```
 
-#### **Create a Department with Sub-Departments**
+---
 
-This mutation creates a new department and includes sub-departments:
+## ✅ **Queries**
 
-```graphql
-mutation {
-  createDepartment(createDepartmentInput: {
-    name: "Engineering"
-    subDepartments: [
-      {
-        name: "Backend"
-      },
-      {
-        name: "Frontend"
-      }
-    ]
-  }) {
-    id
-    name
-    subDepartments {
-      id
-      name
-    }
-  }
-}
-```
-
-#### **List All Departments**
-
-This query retrieves all departments, including their sub-departments:
-
+### 1. `departments`
+- **Description**: Fetch all departments with their sub-departments.
+- **Return Type**: `[DepartmentResponseDto]`
+- **Auth Required**: ✅ Yes
+- **Example**:
 ```graphql
 query {
   departments {
@@ -176,17 +154,18 @@ query {
 }
 ```
 
-#### **Get a Single Department by ID**
+---
 
-This query retrieves a single department by its `id`, along with its sub-departments:
-
+### 2. `department(id: Int!)`
+- **Description**: Fetch a single department by ID.
+- **Return Type**: `DepartmentResponseDto`
+- **Auth Required**: ✅ Yes
+- **Example**:
 ```graphql
 query {
   department(id: 1) {
     id
     name
-    createdAt
-    updatedAt
     subDepartments {
       id
       name
@@ -195,47 +174,94 @@ query {
 }
 ```
 
-#### **Update an Existing Department**
+---
 
-This mutation updates an existing department's name (or other fields as necessary):
+## ✅ **Mutations**
 
+### 1. `createDepartment`
+- **Description**: Create a new department (with optional sub-departments).
+- **Return Type**: `DepartmentResponseDto`
+- **Auth Required**: ✅ Yes
+- **Args**:
+  - `createDepartmentInput`: `{ name: string }`
+  - `subDepartmentsInput` (optional): `[{ name: string }]`
+- **Example**:
 ```graphql
 mutation {
-  updateDepartment(
-    id: 2
-    updateDepartmentInput: {
-      name: "Engineering and Tech"
-    }
+  createDepartment(
+    createDepartmentInput: { name: "Radiology" }
+    subDepartmentsInput: [{ name: "CT Scan" }, { name: "MRI" }]
   ) {
     id
     name
-    updatedAt
+    subDepartments {
+      id
+      name
+    }
   }
 }
 ```
 
-#### **Delete a Department**
+---
 
-This mutation deletes an existing department by its `id`:
+### 2. `updateDepartment`
+- **Description**: Update a department and optionally add/remove sub-departments.
+- **Return Type**: `DepartmentResponseDto`
+- **Auth Required**: ✅ Yes
+- **Args**:
+  - `id`: number
+  - `updateDepartmentInput`: `{ name?: string, subDepartments?: [{ name: string }], removeSubDepartmentIds?: number[] }`
+- **Example**:
+```graphql
+mutation {
+  updateDepartment(
+    id: 1
+    updateDepartmentInput: {
+      name: "Updated Radiology",
+      subDepartments: [{ name: "New SubDept" }],
+      removeSubDepartmentIds: [2]
+    }
+  ) {
+    id
+    name
+    subDepartments {
+      id
+      name
+    }
+  }
+}
+```
 
+---
+
+### 3. `deleteDepartment`
+- **Description**: Delete a department and its sub-departments.
+- **Return Type**: `Boolean`
+- **Auth Required**: ✅ Yes
+- **Args**:
+  - `id`: number
+- **Example**:
 ```graphql
 mutation {
   deleteDepartment(id: 1)
 }
 ```
 
-#### **Add Sub-Departments to an Existing Department**
+---
 
-This mutation adds sub-departments to an existing department:
-
+### 4. `addSubDepartmentsToExistingDepartment`
+- **Description**: Add sub-departments to an existing department.
+- **Return Type**: `DepartmentResponseDto`
+- **Auth Required**: ✅ Yes
+- **Args**:
+  - `departmentId`: number
+  - `subDepartments`: `[{ name: string }]`
+- **Example**:
 ```graphql
 mutation {
-  addSubDepartmentsToDepartment(
-    departmentId: 2
-    subDepartments: [
-      { name: "QA" },
-      { name: "DevOps" }
-    ]
+  addSubDepartmentsToExistingDepartment(
+    departmentId: 1
+    subDepartments: [{ name: "Ultrasound" }, { name: "X-ray" }]
   ) {
     id
     name
@@ -247,26 +273,15 @@ mutation {
 }
 ```
 
-#### **Update a Sub-Department**
+---
 
-This mutation updates the name of an existing sub-department within a department:
-
-```graphql
-mutation {
-  updateSubDepartment(
-    id: 3
-    updateSubDepartmentInput: { name: "Cloud Engineering" }
-  ) {
-    id
-    name
-  }
-}
-```
-
-#### **Delete a Sub-Department**
-
-This mutation deletes a sub-department by its `id`:
-
+### 5. `deleteSubDepartment`
+- **Description**: Delete a sub-department by ID.
+- **Return Type**: `Boolean`
+- **Auth Required**: ✅ Yes
+- **Args**:
+  - `id`: number
+- **Example**:
 ```graphql
 mutation {
   deleteSubDepartment(id: 3)
@@ -277,14 +292,13 @@ mutation {
 
 ### **GraphQL Query Breakdown**
 
-- **Create Department**: Adds a new department with a list of sub-departments.
-- **List Departments**: Fetches all departments along with their sub-departments.
-- **Get Department by ID**: Fetches a specific department and its details, based on `id`.
-- **Update Department**: Updates a department's name or other properties.
-- **Delete Department**: Deletes a department by `id`.
-- **Add Sub-Departments**: Adds multiple sub-departments to a specific department.
-- **Update Sub-Department**: Allows updating the name of an existing sub-department.
-- **Delete Sub-Department**: Deletes a sub-department by `id`.
+- **Create Department**: Creates a department with optional sub-departments.  
+- **List Departments**: Retrieves all departments with their sub-departments.  
+- **Get Department by ID**: Retrieves a department and its sub-departments by ID.  
+- **Update Department**: Updates department name, adds or removes sub-departments.  
+- **Delete Department**: Deletes a department and all its sub-departments.  
+- **Add Sub-Departments**: Adds new sub-departments to an existing department.  
+- **Delete Sub-Department**: Deletes a sub-department by ID.  
 
 ---
 
