@@ -99,16 +99,23 @@ To start the application in development mode:
 npm run start:dev
 ```
 
-The server will start running on `http://localhost:3000`.
+The server will start running locally on `http://localhost:3000`.
+
+### LIVE ACCESS
+**A Big And Sincere Note:** The project instruction is to deploy the project live on `Render.com` but I am not able to use Render because I am asked to enter my card and the dollar card with me is being rejected. So, to meet up and get the project done, I used `Coolify` which is running on my `Virtual Private Server`.
+
+This project is running live on this public url `http://dkg4ockkww84s8gggk0cws0c.62.171.152.178.sslip.io`
 
 ### Accessing the Endpoints
 
 #### **Auth Endpoints**
+-**Swagger Doc** for authentication endpoint is accessible on `http://dkg4ockkww84s8gggk0cws0c.62.171.152.178.sslip.io/api/docs`
+
 - **POST** `/auth/signup`: Used for signing up a new user. Accepts `username` and `password` in the request body.
 - **POST** `/auth/login`: Used for logging in an existing user. Accepts `username` and `password` in the request body. Returns a JWT token.
 
 #### **GraphQL Endpoint**
-- **GraphQL Playground** is available at `http://localhost:3000/graphql`. You can run department-related queries and mutations here.
+- **GraphQL Playground** is available at `http://dkg4ockkww84s8gggk0cws0c.62.171.152.178.sslip.io/graphql`. You can run department-related queries and mutations here.
 
 ---
 
