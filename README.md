@@ -110,12 +110,6 @@ The server will start running on `http://localhost:3000`.
 #### **GraphQL Endpoint**
 - **GraphQL Playground** is available at `http://localhost:3000/graphql`. You can run department-related queries and mutations here.
 
-Here is an updated section for **GraphQL Playground** with comprehensive examples for testing GraphQL queries and mutations:
-
----
-
-Certainly! Here's the updated section with the information that the GraphQL operations are protected and require an access token for authentication:
-
 ---
 
 ### **GraphQL Playground**
