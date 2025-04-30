@@ -47,7 +47,7 @@ This is a project built using **NestJS** to implement a basic authentication sys
 
 Before setting up the project, make sure you have the following installed:
 
-- **Node.js** (v14.x or above)
+- **Node.js** (v18.x or above)
 - **npm** (v6.x or above)
 - **PostgreSQL** (running locally or on a cloud instance)
 
