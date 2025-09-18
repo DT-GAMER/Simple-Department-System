@@ -54,8 +54,8 @@ Before setting up the project, make sure you have the following installed:
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/DT-GAMER/tactology_task.git
-cd tactology_task
+git clone https://github.com/DT-GAMER/Simple-Department-System.git
+cd Simple-Department-System
 ```
 
 ### Install Dependencies
@@ -103,8 +103,6 @@ npm run start:dev
 The server will start running locally on `http://localhost:3000`.
 
 ### LIVE ACCESS
-**A Big And Sincere Note:** The project instruction is to deploy the project live on `Render.com` but I am not able to use Render because I am asked to enter my card and the dollar card with me is being rejected. So, to meet up and get the project done, I used `Coolify` which is running on my `Virtual Private Server`.
-
 This project is running live on this public url `http://dkg4ockkww84s8gggk0cws0c.62.171.152.178.sslip.io`
 
 ### Accessing the Endpoints
